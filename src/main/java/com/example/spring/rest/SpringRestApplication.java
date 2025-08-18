@@ -10,8 +10,7 @@ import org.springframework.context.ApplicationContext;
 public class SpringRestApplication {
 
 	public static void main(String[] args) {
-		ApplicationContext context = SpringApplication.run(SpringRestApplication.class, args);
-		UserService userService = context.getBean(UserService.class);
+		SpringApplication.run(SpringRestApplication.class, args);
 
 
 	}
