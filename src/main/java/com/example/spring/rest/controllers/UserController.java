@@ -5,6 +5,7 @@ import com.example.spring.rest.dtos.UpdateUserRequest;
 import com.example.spring.rest.dtos.RegisterUserRequest;
 
 import com.example.spring.rest.dtos.UserDTO;
+import com.example.spring.rest.entities.Role;
 import com.example.spring.rest.entities.User;
 import com.example.spring.rest.mappers.UserMapper;
 import com.example.spring.rest.services.UserService;
@@ -14,6 +15,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,6 +30,8 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private  final PasswordEncoder passwordEncoder;
+
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers(){
@@ -55,6 +59,8 @@ public class UserController {
             );
         }
         User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
         User savedUser = userService.registerUser(user);
         UserDTO userDTO = userMapper.toDto(savedUser);
 

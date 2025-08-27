@@ -1,8 +1,8 @@
 package com.example.spring.rest.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,9 +28,9 @@ public class User {
 
     private String password;
 
-    //@OneToOne(mappedBy = "user", fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    //private Profile profile;
-
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)  // stores this value as string in db
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
     @Builder.Default
@@ -44,15 +44,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();
-
-//    public void addAddress(Address address) {
-//        addresses.add(address);
-//        address.setUser(this);
-//    }
-//    public void removeAddress(Address address) {
-//        addresses.remove(address);
-//        address.setUser(null);
-//    }
 
     @Override
     public String toString() {

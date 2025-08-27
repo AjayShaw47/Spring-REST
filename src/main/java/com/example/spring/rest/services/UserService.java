@@ -4,17 +4,33 @@ import com.example.spring.rest.dtos.RegisterUserRequest;
 import com.example.spring.rest.entities.*;
 import com.example.spring.rest.repositories.*;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        var user = userRepository.findByEmail(email).orElseThrow(
+                ()->new UsernameNotFoundException("User not found"));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                Collections.emptyList()
+        );
+
+    }
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
@@ -36,27 +52,6 @@ public class UserService {
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
-
-/*
-    UserResponse convertToUserDTO(User user){
-        return new UserResponse(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
-    }
-
-    User convertToUser (RegisterUserRequest userRequest){
-       User user = new User();
-       user.setName(userRequest.getName());
-       user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
-
-        return user;
-    }
-
- */
-
 
 
 }
