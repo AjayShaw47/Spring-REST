@@ -42,8 +42,9 @@ public class CartService {
     }
 
     public CartDTO getCart(UUID cartId){
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(CartNotFoundException::new);
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if(cart == null)
+            return null;
         return cartMapper.toDto(cart);
     }
 
@@ -75,4 +76,7 @@ public class CartService {
         cartRepository.save(cart);
 
     }
+
+
+
 }
