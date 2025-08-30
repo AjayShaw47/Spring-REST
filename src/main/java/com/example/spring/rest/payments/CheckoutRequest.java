@@ -1,4 +1,4 @@
-package com.example.spring.rest.dtos;
+package com.example.spring.rest.payments;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

@@ -1,8 +1,6 @@
 package com.example.spring.rest.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,13 +25,13 @@ public class Order {
     private User customer;
 
     @Enumerated(EnumType.STRING)  // Store as string instead of ordinal
-    private OrderStatus status;
+    private PaymentStatus status;
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime createdAt;
     private BigDecimal totalPrice;
 
-    @OneToMany(mappedBy = "order",cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "order",cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
 
     private List<OrderItem> items = new ArrayList<>();
 
@@ -41,7 +39,7 @@ public class Order {
 
         Order order= new Order();
         order.setCustomer(customer);
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(PaymentStatus.PENDING);
         order.setTotalPrice(cart.getTotalPrice());
 
 

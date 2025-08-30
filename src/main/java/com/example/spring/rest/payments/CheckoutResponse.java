@@ -1,4 +1,4 @@
-package com.example.spring.rest.dtos;
+package com.example.spring.rest.payments;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class CheckoutResponse {
     private Long orderId;
+    private String checkoutUrl;
 }

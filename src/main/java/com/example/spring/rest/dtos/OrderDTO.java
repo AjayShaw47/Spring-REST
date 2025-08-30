@@ -1,7 +1,6 @@
 package com.example.spring.rest.dtos;
 
-import com.example.spring.rest.entities.OrderStatus;
-import com.example.spring.rest.services.OrderService;
+import com.example.spring.rest.entities.PaymentStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @Setter
 public class OrderDTO {
     private Long id;
-    private OrderStatus status;
+    private PaymentStatus status;
     private LocalDateTime createdAt;
     private List<OrderItemDTO> items;
     private BigDecimal totalPrice;
