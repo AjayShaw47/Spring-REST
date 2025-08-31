@@ -1,9 +1,9 @@
 package com.example.spring.rest.payments;
 
 import com.example.spring.rest.dtos.ErrorDTO;
-import com.example.spring.rest.exceptions.CartEmptyException;
-import com.example.spring.rest.exceptions.CartNotFoundException;
-import com.example.spring.rest.repositories.OrderRepository;
+import com.example.spring.rest.carts.CartEmptyException;
+import com.example.spring.rest.carts.CartNotFoundException;
+import com.example.spring.rest.orders.OrderRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
