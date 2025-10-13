@@ -1,6 +1,6 @@
 package com.example.spring.rest.auth;
 
-import com.example.spring.rest.users.UserDTO;
+import com.example.spring.rest.users.UserResponse;
 import com.example.spring.rest.users.UserMapper;
 import com.example.spring.rest.users.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -51,7 +49,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> me() {
+    public ResponseEntity<UserResponse> me() {
         var user = authService.getCurrentUser();
         if (user == null) {
             return ResponseEntity.notFound().build();

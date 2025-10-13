@@ -1,4 +1,4 @@
-package com.example.spring.rest.dtos;
+package com.example.spring.rest.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

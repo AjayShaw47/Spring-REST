@@ -59,7 +59,7 @@ public class CartService {
                 .orElseThrow(CartNotFoundException::new);
 
         cart.removeItem(productId);
-
+        cartRepository.save(cart); // Save the changes to persist the removal
     }
 
     public void clearCart(UUID cartId) {

@@ -1,5 +1,6 @@
 package com.example.spring.rest.auth;
 
+import com.example.spring.rest.common.SecurityRules;
 import com.example.spring.rest.users.Role;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -28,6 +31,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final List<SecurityRules> featureSecurityRules;
 
 
     @Bean
@@ -62,35 +66,14 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)  // REST do not need csrf protection
-                .authorizeHttpRequests(auths -> auths
-                                .requestMatchers("/carts/**").permitAll()
-                                .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
-                                .requestMatchers(HttpMethod.POST,"/users").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/auth/refresh").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/checkout/webhook").permitAll()
-                                .anyRequest().authenticated()
-                                  // .anyRequest().permitAll()   // mentioning only this will make the endpoints as public
+                .cors(cors -> {})              // enable CORS
+                .authorizeHttpRequests(c -> {
+                    featureSecurityRules.forEach(r->r.configure(c));
+                    c.anyRequest().authenticated();
+                        }
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                /*
-                HTTP Request with: Authorization: Bearer <jwt-token>
-                             ↓
-                    1. JwtAuthenticationFilter (OUR CUSTOM FILTER)
-                       - Extracts Bearer token
-                       - Validates JWT
-                       - Sets SecurityContext with user info
-                       - Calls filterChain.doFilter()
-                             ↓
-                    2. UsernamePasswordAuthenticationFilter
-                       - Sees SecurityContext already has authentication
-                       - Skips its processing
-                       - Calls filterChain.doFilter()
-                             ↓
-                    3. Other filters...
-                             ↓
-                    4. Your Controller Method (with authenticated user)
-                 */
+
                 .exceptionHandling(c->
                 {
                     c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));

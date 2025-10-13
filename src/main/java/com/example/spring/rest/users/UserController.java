@@ -22,18 +22,18 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
         List<User> users =  userService.getAllUsers();
-        List<UserDTO> userDTOs = users.stream().map(userMapper::toDto).toList();
+        List<UserResponse> userDTOs = users.stream().map(userMapper::toDto).toList();
 
-        return ResponseEntity.ok(userDTOs);
+        return ResponseEntity.ok(userDTOs); // 200 OK
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Long id){
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id){
         User user = userService.getUser(id);
         if(user == null){
-            return ResponseEntity.notFound().build();  // 204 No Content
+            return ResponseEntity.notFound().build();  // 404 Not found
         }
         return ResponseEntity.ok(userMapper.toDto(user));
     }
@@ -50,32 +50,32 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
         User savedUser = userService.registerUser(user);
-        UserDTO userDTO = userMapper.toDto(savedUser);
+        UserResponse userDTO = userMapper.toDto(savedUser);
 
         URI location = URI.create("/users/" + savedUser.getId());
-        return ResponseEntity.created(location).body(userDTO);
+        return ResponseEntity.created(location).body(userDTO); // // 201 Created with Location header
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request){
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request){
         User user = userService.getUser(id);
         if(user == null){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // 404 Not Found
         }
         userMapper.update(request,user);
         userService.registerUser(user);  // JPA first checks if a record with that ID exists in the database: If yes → UPDATE,If no → INSERT
 
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return ResponseEntity.ok(userMapper.toDto(user)); // 200 OK
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         User user = userService.getUser(id);
         if(user == null){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // 404
         }
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); // 204
 
     }
 
