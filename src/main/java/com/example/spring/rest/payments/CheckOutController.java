@@ -1,6 +1,6 @@
 package com.example.spring.rest.payments;
 
-import com.example.spring.rest.dtos.ErrorDTO;
+import com.example.spring.rest.common.ErrorDTO;
 import com.example.spring.rest.carts.CartEmptyException;
 import com.example.spring.rest.carts.CartNotFoundException;
 import com.example.spring.rest.orders.OrderRepository;

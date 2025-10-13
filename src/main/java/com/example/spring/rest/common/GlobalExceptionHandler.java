@@ -1,6 +1,5 @@
-package com.example.spring.rest.controllers;
+package com.example.spring.rest.common;
 
-import com.example.spring.rest.dtos.ErrorDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -1,6 +1,6 @@
 package com.example.spring.rest.orders;
 
-import com.example.spring.rest.dtos.ErrorDTO;
+import com.example.spring.rest.common.ErrorDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

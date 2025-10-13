@@ -5,8 +5,11 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserDTO {
+public class UserResponse {
     private Long id;
     private String name;
     private String email;
+
+    // Don't expose password!
+
 }

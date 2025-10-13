@@ -22,8 +22,6 @@ public class Product {
 
     private String name;
 
-    private String description;
-
     private BigDecimal price;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -41,7 +39,6 @@ public class Product {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
                 ", price=" + price +
                 '}';
     }
