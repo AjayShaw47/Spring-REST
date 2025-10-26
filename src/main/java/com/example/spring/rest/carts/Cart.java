@@ -1,6 +1,7 @@
 package com.example.spring.rest.carts;
 
 import com.example.spring.rest.products.Product;
+import com.example.spring.rest.users.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +23,17 @@ public class Cart {
     private UUID id;
 
     @Column(name = "date_created", insertable = false,updatable = false)  // tells hibernate to ignore this field while generating sql statement for insert and update
-    @Generated  // Hibernate knows this is a generated value because of @GeneratedValue/@Generated - After INSERT, Hibernate automatically retrieves the generated ID from the database
+    @Generated  // Hibernate knows this is a generated value because of @GeneratedValue/@Generated
     private LocalDate dateCreated;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.MERGE, orphanRemoval = true)  // MERGE → Updates both the Cart and all attached CartItem objects if they are already in the database,
-    private Set<CartItem> items = new HashSet<>();                                    // New children will not be auto-inserted unless you also have CascadeType.PERSIST.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "cart",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
+            orphanRemoval = true)
+    private Set<CartItem> items = new HashSet<>();
 
     public BigDecimal getTotalPrice(){
         return items.stream()
@@ -40,14 +47,14 @@ public class Cart {
                 .findFirst().orElse(null);
     }
 
-    public CartItem addItem(Product product){
+    public CartItem addItem(Product product, Integer quantity){
         CartItem cartItem =  getItem(product.getId());
         if(cartItem != null){
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         }else {
             cartItem = new CartItem();
             cartItem.setProduct(product);
-            cartItem.setQuantity(1);
+            cartItem.setQuantity(quantity);
             cartItem.setCart(this);
             items.add(cartItem);
         }

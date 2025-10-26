@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CartSecurityRules implements SecurityRules {
     @Override
     public void configure(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
-//        registry.requestMatchers("/cart/**").permitAll();
+        registry.requestMatchers("/api/carts/**").permitAll();
 
     }
 }

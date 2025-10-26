@@ -3,6 +3,9 @@ package com.example.spring.rest.carts;
 import com.example.spring.rest.products.Product;
 import com.example.spring.rest.products.ProductNotFoundException;
 import com.example.spring.rest.products.ProductRepository;
+import com.example.spring.rest.users.User;
+import com.example.spring.rest.users.UserRepository;
+import com.example.spring.rest.users.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,22 +16,30 @@ import java.util.UUID;
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final CartMapper cartMapper;
 
-    public CartDTO createCart(){
+    public CartDTO createCart(Long userId){
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
         Cart cart = new Cart();
-        Cart savedCart =  cartRepository.save(cart);
+        cart.setUser(user);
+        Cart savedCart =  cartRepository.save(cart); // directly saves the owning side
        return cartMapper.toDto(savedCart);
    }
+   /* Note we are not doing this because User already exists in DB
+    user.getCarts().add(cart);
+    userRepository.save(user);
+    */
 
-    public CartItemDTO addItemToCart(UUID cartId, Long productId) {
+    public CartItemDTO addItemToCart(UUID cartId, Long productId, Integer quantity) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(CartNotFoundException::new);  // new CartNotFoundException()
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(ProductNotFoundException::new);
 
-        var cartItem = cart.addItem(product);
+        var cartItem = cart.addItem(product,quantity);
 
         cartRepository.save(cart);
         return cartMapper.toDto(cartItem);

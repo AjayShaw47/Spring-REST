@@ -10,5 +10,6 @@ import java.math.BigDecimal;
 public class CartItemDTO {
     private ProductDTO product;
     private Integer quantity;
+    private Integer deliveryOptionId;
     private BigDecimal totalPrice;
 }

@@ -27,6 +27,9 @@ public class CartItem {
 
     private Integer quantity;
 
+    @Column(name = "delivery_option_id", insertable = false)
+    private Integer deliveryOptionId;
+
     public BigDecimal getTotalPrice(){
         return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }

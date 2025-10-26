@@ -1,6 +1,8 @@
 package com.example.spring.rest.carts;
 
 import com.example.spring.rest.products.ProductNotFoundException;
+import com.example.spring.rest.users.User;
+import com.example.spring.rest.users.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,23 +14,35 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/carts")
+@RequestMapping("/api/carts")
 public class CartController {
 
    private final CartService cartService;
+   private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<CartDTO> registerCart(){
-        CartDTO cartDTO =  cartService.createCart();
+    public ResponseEntity<CartDTO> registerCart(@RequestBody RegisterCartRequest request){
+
+        CartDTO cartDTO =  cartService.createCart(request.getUserId());
         URI location = URI.create("/carts/" + cartDTO.getId());
         return ResponseEntity.created(location).body(cartDTO);
 
     }
 
+    @GetMapping("/{userId}/items")
+    public ResponseEntity<?> getCartItemsByUserId(@PathVariable Long userId){
+        User user = userService.getUser(userId);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error","Unauthorized"));
+        }
+        CartDTO cartDTO = cartService.getCart(user.getCarts().get(0).getId());
+        return ResponseEntity.ok(cartDTO);
+    }
+
     @PostMapping("{cartId}/items")
     public ResponseEntity<CartItemDTO> addProductToCart(@PathVariable UUID cartId, @RequestBody AddToCartItemRequest request){
 
-         CartItemDTO cartItemDTO = cartService.addItemToCart(cartId, request.getProduct_id());
+         CartItemDTO cartItemDTO = cartService.addItemToCart(cartId, request.getProductId(), request.getQuantity());
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDTO);
 
     }

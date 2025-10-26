@@ -1,5 +1,6 @@
 package com.example.spring.rest.users;
 
+import com.example.spring.rest.carts.Cart;
 import com.example.spring.rest.products.Product;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,15 +15,12 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "users")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     private String name;
@@ -36,8 +34,10 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
-    @Builder.Default
     private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
+    private List<Cart> carts = new ArrayList<>();
 
 
     @ManyToMany
@@ -51,12 +51,22 @@ public class User {
 //    @OneToMany(mappedBy = "customer")
 //    private List<OrderItem> orders = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    /*
+    The relation is a bidirectional one-to-many: one User can have many Address entries.
+    In User the collection is the inverse (non-owning) side because of mappedBy = "user".
+    Cascade PERSIST and REMOVE mean addresses are saved/removed with the user;
+    orphanRemoval = true deletes an address if it’s removed from the addresses list.
+
+    // Add these helpers to the User entity:
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setUser(this);
     }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setUser(null);
+    }
+
+     */
 }
