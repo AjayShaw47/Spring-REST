@@ -12,5 +12,7 @@ public class ProductDTO {
     private String name;
     private BigDecimal price;
     private Byte categoryId;
+    private Integer ratingCount;
+    private BigDecimal ratingStar;
 
 }

@@ -1,21 +1,17 @@
 package com.example.spring.rest.orders;
 
-import com.example.spring.rest.payments.PaymentStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class OrderDTO {
-    private UUID id;
+public class CreateOrderRequest {
     private Long customerId;
-    private OrderStatus status;
-    private LocalDateTime createdAt;
+    private UUID cartId;
     private List<OrderItemDTO> items;
     private BigDecimal totalPrice;
 }

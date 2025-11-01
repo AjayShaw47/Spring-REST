@@ -8,20 +8,29 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
+
+    @PostMapping
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody CreateOrderRequest request){
+        OrderDTO orderDTO = orderService.createOrder(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
+    }
+
     @GetMapping
-    public List<OrderDTO> getOrders(){
+    public List<UserOrderResponse> getUserOrders(){
         return orderService.getUserOrders();
     }
 
-    @GetMapping("/orderId")
-    public OrderDTO getOrder(@PathVariable Long orderId){
-        return orderService.getOrder(orderId);
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable UUID orderId){
+        OrderDTO orderDTO = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(orderDTO);
     }
 
     @ExceptionHandler(OrderNotFoundException.class)

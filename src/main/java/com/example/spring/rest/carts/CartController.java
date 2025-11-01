@@ -55,7 +55,7 @@ public class CartController {
     public ResponseEntity<CartItemDTO> updateCart(@PathVariable UUID cartId,
                                                   @PathVariable Long productId,
                                                   @RequestBody UpdateCart request) {
-        CartItemDTO cartItemDTO = cartService.updateCart(cartId, productId, request.getQuantity());
+        CartItemDTO cartItemDTO = cartService.updateCart(cartId, productId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDTO);
 
     }
@@ -74,6 +74,19 @@ public class CartController {
         cartService.clearCart(cartId);
         return ResponseEntity.noContent().build();
 
+    }
+
+   @DeleteMapping
+    // write a delete mapping to clear all carts from the database
+    public ResponseEntity<?> clearAllCarts(){
+        cartService.clearAllCarts();
+        return ResponseEntity.noContent().build();
+   }
+
+    @GetMapping("/{cartId}/payment-summary")
+    public ResponseEntity<PaymentSummary> getPaymentSummary(@PathVariable UUID cartId){
+        PaymentSummary paymentSummary = cartService.getPaymentSummary(cartId);
+        return ResponseEntity.ok(paymentSummary);
     }
 
     @ExceptionHandler(CartNotFoundException.class)

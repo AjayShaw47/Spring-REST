@@ -4,8 +4,10 @@ import com.example.spring.rest.products.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,6 +31,9 @@ public class CartItem {
 
     @Column(name = "delivery_option_id", insertable = false)
     private Integer deliveryOptionId;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private LocalDateTime createdAt;
 
     public BigDecimal getTotalPrice(){
         return product.getPrice().multiply(BigDecimal.valueOf(quantity));

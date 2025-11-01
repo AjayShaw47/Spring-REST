@@ -9,14 +9,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface OrderRepository extends JpaRepository<Order,Long> {
+public interface OrderRepository extends JpaRepository<Order,UUID> {
 
-    @EntityGraph(attributePaths = "items.product")
-    @Query("SELECT o FROM Order o WHERE o.customer = :customer")
-    List<Order> getOrdersByCustomer(@Param("customer") User customer);
+//    @EntityGraph(attributePaths = "items.product")
+//    @Query("SELECT o FROM Order o WHERE o.customer = :customer")
+//    List<Order> getOrdersByCustomer(@Param("customer") User customer);
+//
+//    @EntityGraph(attributePaths = "items.product")
+//    @Query("SELECT o FROM Order o WHERE o.id = :orderId")
+//    Optional<Order> getOrderWithItems(@Param("orderId") Long orderId);
 
-    @EntityGraph(attributePaths = "items.product")
-    @Query("SELECT o FROM Order o WHERE o.id = :orderId")
-    Optional<Order> getOrderWithItems(@Param("orderId") Long orderId);
+     List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status);
+
 }

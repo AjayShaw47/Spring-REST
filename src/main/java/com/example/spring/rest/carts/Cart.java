@@ -33,6 +33,7 @@ public class Cart {
     @OneToMany(mappedBy = "cart",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true)
+    @OrderBy("createdAt ASC")
     private Set<CartItem> items = new HashSet<>();
 
     public BigDecimal getTotalPrice(){

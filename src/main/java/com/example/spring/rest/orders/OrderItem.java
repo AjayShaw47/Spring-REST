@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -25,15 +26,12 @@ public class OrderItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private BigDecimal unitPrice;
     private Integer quantity;
-    private BigDecimal totalPrice;
 
-    public OrderItem(Order order, Product product, Integer quantity) {
-        this.order = order;
-        this.product = product;
-        this.quantity = quantity;
-        this.unitPrice = product.getPrice();
-        this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
-    }
+    @Column(name = "delivery_option_id")
+    private Integer deliveryOptionId;
+
+    private LocalDateTime estimatedDeliveryDate;
+
+
 }

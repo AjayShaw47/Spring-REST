@@ -1,6 +1,7 @@
 package com.example.spring.rest.users;
 
 import com.example.spring.rest.carts.Cart;
+import com.example.spring.rest.orders.Order;
 import com.example.spring.rest.products.Product;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,6 +40,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
     private List<Cart> carts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "customer",cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -47,9 +50,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();
-
-//    @OneToMany(mappedBy = "customer")
-//    private List<OrderItem> orders = new ArrayList<>();
 
     /*
     The relation is a bidirectional one-to-many: one User can have many Address entries.
