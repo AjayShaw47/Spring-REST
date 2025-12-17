@@ -6,9 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class UpdateCart {
-    private Integer quantity;
-    private Integer deliveryOptionId;
+public record UpdateCart( Integer quantity,Integer deliveryOptionId) {
+
 }

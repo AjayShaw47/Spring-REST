@@ -1,18 +1,13 @@
 package com.example.spring.rest.products;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-public class ProductDTO {
-    private Long id;
-    private String name;
-    private BigDecimal price;
-    private Byte categoryId;
-    private Integer ratingCount;
-    private BigDecimal ratingStar;
-
+public record ProductDTO(
+        Long id,
+        String name,
+        BigDecimal price,
+        Byte categoryId,
+        Integer ratingCount,
+        BigDecimal ratingStar
+) {
 }

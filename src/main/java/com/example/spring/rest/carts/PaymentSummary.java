@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 public class PaymentSummary {
-    private int totalItems;
+    private Integer totalItems;
     private BigDecimal productCost;
-    private int shippingCost;
+    private Integer shippingCost;
     private BigDecimal totalCostBeforeTax;
     private BigDecimal tax;
     private BigDecimal totalCost;

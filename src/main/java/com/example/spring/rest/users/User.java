@@ -5,12 +5,13 @@ import com.example.spring.rest.orders.Order;
 import com.example.spring.rest.products.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Setter
 @Getter
@@ -18,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +32,18 @@ public class User {
     private String password;
 
     @Column(name = "role")
-    @Enumerated(EnumType.STRING)  // stores this value as string in db
+    @Enumerated(EnumType.STRING)  // stores this value as string in db, if you don’t specify @Enumerated, Hibernate uses: @Enumerated(EnumType.ORDINAL),
+    // That means it stores the ordinal number of the enum constant: USER -> 0 and ADMIN -> 1, This causes serious issues if you change the enum order later
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
+    @Column(name = "created_at",updatable = false, insertable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", insertable = false)
+    private LocalDateTime updatedAt;
+
+    @ElementCollection
+    @CollectionTable(name = "user_addresses", joinColumns = @JoinColumn(name = "user_id"))
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
@@ -51,7 +60,38 @@ public class User {
     )
     private Set<Product> products = new HashSet<>();
 
-    /*
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+
+/*
     The relation is a bidirectional one-to-many: one User can have many Address entries.
     In User the collection is the inverse (non-owning) side because of mappedBy = "user".
     Cascade PERSIST and REMOVE mean addresses are saved/removed with the user;

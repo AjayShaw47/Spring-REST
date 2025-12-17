@@ -3,13 +3,11 @@ package com.example.spring.rest.users;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class UserResponse {
-    private Long id;
-    private String name;
-    private String email;
-
-    // Don't expose password!
-
+public record UserResponse(
+        Long id,
+        String name,
+        String email
+        // Don't expose password!
+) {
 }
+

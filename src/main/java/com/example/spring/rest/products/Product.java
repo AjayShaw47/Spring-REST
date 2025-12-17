@@ -30,6 +30,10 @@ public class Product {
 
     private Integer ratingCount;
 
+    @ElementCollection
+    @CollectionTable(name = "product_tags")
+    @Column(name = "tag", length = 10, nullable = false)
+    private Set<String> tags = new HashSet<>();
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

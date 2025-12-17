@@ -27,6 +27,7 @@ public class CartItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(name = "quantity")
     private Integer quantity;
 
     @Column(name = "delivery_option_id", insertable = false)

@@ -9,7 +9,7 @@ import org.hibernate.annotations.Generated;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,21 +20,33 @@ import java.util.UUID;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id",columnDefinition = "UUID", updatable = false)
     private UUID id;
 
-    @Column(name = "date_created", insertable = false,updatable = false)  // tells hibernate to ignore this field while generating sql statement for insert and update
-    @Generated  // Hibernate knows this is a generated value because of @GeneratedValue/@Generated
+    @Column(name = "status",insertable = false, length = 10, nullable = false)
+    private String status;
+
+    @Column(name = "date_created", insertable = false,updatable = false)
     private LocalDate dateCreated;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "cart",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true)
     @OrderBy("createdAt ASC")
-    private Set<CartItem> items = new HashSet<>();
+    private Set<CartItem> items = new LinkedHashSet<>();
+
+    /*
+  `@OrderBy("createdAt ASC")`: This annotation works at the database level. It tells Hibernate to add an ORDER BY clause to the SQL query when it fetches the cart items.
+   This ensures the items are retrieved from the database already sorted by their creation time.
+  `LinkedHashSet`: This works at the application level. Its job is to preserve the order of the items as they are added to it.
+
+  If you were to remove @OrderBy, the database would return the items in an arbitrary order, and the LinkedHashSet would just preserve that incorrect, arbitrary order.
+  You need both to guarantee your cart items are always sorted correctly.
+  */
 
     public BigDecimal getTotalPrice(){
         return items.stream()
@@ -66,7 +78,6 @@ public class Cart {
         var cartItem = getItem(productId);
         if(cartItem != null){
             items.remove(cartItem);
-
         }
     }
 
@@ -77,6 +88,5 @@ public class Cart {
     public boolean isEmpty(){
         return items.isEmpty();
     }
-
 
 }

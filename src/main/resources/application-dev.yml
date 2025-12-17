@@ -1,0 +1,13 @@
+# === PostgresSQL DB Configuration ===
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: postgres
+    password: snake
+    driver-class-name: org.postgresql.Driver
+
+# === JPA / Hibernate Configuration ===
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only (creates/updates tables automatically)
+    show-sql: true

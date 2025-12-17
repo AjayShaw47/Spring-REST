@@ -1,5 +1,6 @@
 package com.example.spring.rest.carts;
 
+import com.example.spring.rest.common.ResourceNotFoundException;
 import com.example.spring.rest.products.Product;
 import com.example.spring.rest.products.ProductNotFoundException;
 import com.example.spring.rest.products.ProductRepository;
@@ -17,25 +18,22 @@ import java.util.UUID;
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
     private final CartMapper cartMapper;
 
-    public CartDTO createCart(Long userId){
-
-        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
-        Cart cart = new Cart();
-        cart.setUser(user);
-        Cart savedCart =  cartRepository.save(cart); // directly saves the owning side
-       return cartMapper.toDto(savedCart);
-   }
-   /* Note we are not doing this because User already exists in DB
-    user.getCarts().add(cart);
-    userRepository.save(user);
-    */
+    public CartDTO getActiveCartForUser(User user) {
+        Cart cart = cartRepository.findByUserAndStatus(user,"ACTIVE")
+                .orElseGet(()->{
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    user.getCarts().add(newCart);
+                    return cartRepository.save(newCart);
+                });
+        return cartMapper.toDto(cart);
+    }
 
     public CartItemDTO addItemToCart(UUID cartId, Long productId, Integer quantity) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(CartNotFoundException::new);  // new CartNotFoundException()
+                .orElseThrow(CartNotFoundException::new);
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(ProductNotFoundException::new);
@@ -46,13 +44,6 @@ public class CartService {
         return cartMapper.toDto(cartItem);
     }
 
-    public CartDTO getCart(UUID cartId){
-        Cart cart = cartRepository.findById(cartId).orElse(null);
-        if(cart == null)
-            return null;
-        return cartMapper.toDto(cart);
-    }
-
     public CartItemDTO updateCart(UUID cartId, Long productId,UpdateCart request ) {
 
         Cart cart = cartRepository.findById(cartId)
@@ -61,10 +52,10 @@ public class CartService {
         CartItem cartItem =  cart.getItem(productId);
         if(cartItem == null)
             throw new ProductNotFoundException();
-        if(request.getQuantity() != null)
-            cartItem.setQuantity(request.getQuantity());
-        if(request.getDeliveryOptionId() != null)
-            cartItem.setDeliveryOptionId(request.getDeliveryOptionId());
+        if(request.quantity() != null)
+            cartItem.setQuantity(request.quantity());
+        if(request.deliveryOptionId() != null)
+            cartItem.setDeliveryOptionId(request.deliveryOptionId());
         cartRepository.save(cart);
         return cartMapper.toDto(cartItem);
     }
@@ -84,7 +75,6 @@ public class CartService {
         cartRepository.save(cart);
 
     }
-
 
     public PaymentSummary getPaymentSummary(UUID cartId) {
 
@@ -116,7 +106,4 @@ public class CartService {
         );
     }
 
-    public void clearAllCarts() {
-        cartRepository.deleteAll();
-    }
 }

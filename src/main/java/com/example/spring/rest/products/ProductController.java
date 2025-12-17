@@ -29,9 +29,8 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO){
         ProductDTO savedProduct = productService.registerProduct(productDTO);
-        URI location = URI.create("/products/" + savedProduct.getId());
-        return ResponseEntity.created
-(location).body(productDTO);
+        URI location = URI.create("/products/" + savedProduct.id());
+        return ResponseEntity.created(location).body(productDTO);
     }
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id,

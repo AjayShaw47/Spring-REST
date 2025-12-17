@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: Spring-REST
+  profiles:
+    active: dev
+
+jwt:
+  secret-key: ${JWT_SECRET}
+  expiration: 900        # in seconds (15 minutes)
+  refresh-expiration: 604800    # in seconds (7 days)
+stripe:
+  secretKey: ${STRIPE_SECRET_KEY}
+  webhookSecretKey: ${STRIPE_WEBHOOK_SECRET_KEY}
+

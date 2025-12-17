@@ -3,31 +3,16 @@ package com.example.spring.rest.users;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-@Getter
-@Setter
-@Entity
-@Table(name="addresses")
+@Embeddable
 public class Address {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "street")
+    @Column(length = 100,nullable = false)
     private String street;
-
+    @Column(length = 50,nullable = false)
     private String city;
-
-    private String zip;
-
+    @Column(length = 20,nullable = false)
+    private String pinCode;
+    @Column(length = 50,nullable = false)
     private String state;
-
-   @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    @Column(length = 50,nullable = false)
+    private String country;
 }

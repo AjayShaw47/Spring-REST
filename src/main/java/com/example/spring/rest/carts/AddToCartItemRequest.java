@@ -3,9 +3,5 @@ package com.example.spring.rest.carts;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class AddToCartItemRequest {
-    private Long productId;
-    private Integer quantity;
+public record AddToCartItemRequest( Long productId,Integer quantity) {
 }

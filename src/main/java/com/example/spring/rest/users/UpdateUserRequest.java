@@ -5,16 +5,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class UpdateUserRequest {
+public record UpdateUserRequest (
 
-    @Size(min = 2, max = 50)
-    private String name;
+    @Size(min = 3, max = 30, message = "Name must be between 3 and 30 characters")
+    String name,
 
-    @Email(message = "Invalid email format")
-    private String email;
+    @Email(message = "Please provide a valid email")
+    String email
 
     // Password update should be separate endpoint
-
+){
 }

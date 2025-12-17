@@ -1,51 +1,93 @@
 package com.example.spring.rest.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var authHeader = request.getHeader("Authorization");
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request,response);  // passes the response to next filter in the chain at this point spring security will kick in and if the target end point is protected it will not be accessible
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
-        var token = authHeader.replace("Bearer ", "");
-        var jwt = jwtService.parseToken(token);
-        if(jwt == null || jwt.isExpired()){
-            filterChain.doFilter(request,response);
-            return;
-        } // if the code reach after this point then that means we have a valid token and now protected resources are accessible
-        var authentication = new UsernamePasswordAuthenticationToken(
-                jwt.getUserId(),
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + jwt.getRole()))
 
-        );
-        /*
-        userId - principal
-        credential - null bec the user has already been authenticated via JWT token validation
-         */
-        authentication.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)  // attaching some additional meta data about the request
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);  // stores information about the currently authenticated user
-        filterChain.doFilter(request,response);
+        try {
+            final String jwt = authHeader.substring(7);
+            if (jwt.trim().isEmpty()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            final String userEmail = jwtService.extractUsername(jwt);
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+            filterChain.doFilter(request, response);
+        } catch (MalformedJwtException | ExpiredJwtException e) {
+            handleJwtException(response, e);
+        } catch (Exception e) {
+            handleGenericException(response, e);
+        }
+    }
+
+    private void handleJwtException(HttpServletResponse response, Exception e) throws IOException {
+        logger.error("JWT validation error: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid or expired JWT token");
+        error.put("message", e.getMessage());
+        response.getWriter().write(objectMapper.writeValueAsString(error));
+    }
+
+    private void handleGenericException(HttpServletResponse response, Exception e) throws IOException {
+        logger.error("An unexpected error occurred during JWT processing: {}", e.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setContentType("application/json");
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "An unexpected error occurred");
+        response.getWriter().write(objectMapper.writeValueAsString(error));
     }
 }
