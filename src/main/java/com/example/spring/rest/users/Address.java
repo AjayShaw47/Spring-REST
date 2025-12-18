@@ -15,4 +15,6 @@ public class Address {
     private String state;
     @Column(length = 50,nullable = false)
     private String country;
+    @Column(nullable = false)
+    private boolean primaryAddress;
 }
