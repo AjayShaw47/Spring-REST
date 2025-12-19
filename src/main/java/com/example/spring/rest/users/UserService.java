@@ -22,9 +22,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public List<UserResponse> getAllUsers(){
-        List<User> users = userRepository.findAll();
-        return users.stream().map(userMapper::toDto).toList();
+    public List<UserSummary> getAllUsers(){
+        return userRepository.findAllBy();
     }
 
     public UserResponse getUser(Long id){

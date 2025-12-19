@@ -25,12 +25,13 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse>  getAllUsers(){
+    public List<UserSummary>  getAllUsers(){
         return userService.getAllUsers(); // 200
         // need to implement filtering, sorting, pagination
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id){
         UserResponse user = userService.getUser(id);
         return ResponseEntity.ok(user); // 200
