@@ -27,7 +27,6 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserSummary>  getAllUsers(){
         return userService.getAllUsers(); // 200
-        // need to implement filtering, sorting, pagination
     }
 
     @GetMapping("/{id}")
