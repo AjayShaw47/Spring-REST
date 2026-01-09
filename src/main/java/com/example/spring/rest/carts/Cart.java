@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,7 +22,7 @@ import java.util.UUID;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id",columnDefinition = "UUID", updatable = false)
+    @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
     @Column(name = "status",insertable = false, length = 10, nullable = false)

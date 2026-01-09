@@ -1,11 +1,15 @@
 package com.example.spring.rest.products;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -14,9 +18,13 @@ public class ProductController {
     private  ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getProducts(@RequestParam(required = false, name = "categoryId") Byte categoryId){
-        List<ProductDTO> productDTOS = productService.getALlProducts(categoryId);
-        return ResponseEntity.ok(productDTOS);
+    public ResponseEntity<Map<String, Object>> getProducts(@RequestParam(required = false) Byte categoryId,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size){
+
+        Map<String, Object> response = productService.getALlProducts(categoryId,page,size);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

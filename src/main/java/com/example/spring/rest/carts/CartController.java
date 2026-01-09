@@ -23,7 +23,7 @@ public class CartController {
     @GetMapping("/active")
     public ResponseEntity<CartDTO> getActiveCart(@AuthenticationPrincipal UserDetails userDetails) {
         User user = (User) userDetails;
-        System.out.println("Authenticated user: " + userDetails.getUsername());
+        System.out.println("Authenticated active user: " + user.getEmail());
         CartDTO cart = cartService.getActiveCartForUser(user);
         return ResponseEntity.ok(cart);
     }

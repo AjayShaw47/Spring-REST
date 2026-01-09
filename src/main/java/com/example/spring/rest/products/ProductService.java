@@ -1,9 +1,16 @@
 package com.example.spring.rest.products;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -12,15 +19,23 @@ public class ProductService {
     private ProductMapper productMapper;
     private CategoryRepository categoryRepository;
 
-    public List<ProductDTO> getALlProducts(Byte categoryId) {
-        List<Product> products;
+    public Map<String, Object> getALlProducts(Byte categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage;
         if(categoryId != null)
-            products =  productRepository.findByCategoryId(categoryId);
-        else{
-            products =  productRepository.findAll();
+            productPage =  productRepository.findByCategoryId(categoryId,pageable);
+        else
+            productPage =  productRepository.findAll(pageable);
 
-        }
-        return products.stream().map(product -> productMapper.toDto(product)).toList();
+        List<ProductDTO> productDTO = productPage.getContent().stream().map(product -> productMapper.toDto(product)).toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", productDTO);
+        response.put("currentPage", productPage.getNumber());
+        response.put("totalItems", productPage.getTotalElements());
+        response.put("totalPages", productPage.getTotalPages());
+
+        return response;
 
     }
 

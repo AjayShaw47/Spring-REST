@@ -1,13 +1,14 @@
 # === PostgresSQL DB Configuration ===
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: postgres
+    url: jdbc:oracle:thin:@localhost:1521/FREEPDB1
+    username: ecommerce
     password: snake
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
 
-# === JPA / Hibernate Configuration ===
   jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
     hibernate:
-      ddl-auto: update   # dev only (creates/updates tables automatically)
+      ddl-auto: update
     show-sql: true

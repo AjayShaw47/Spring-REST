@@ -1,12 +1,12 @@
 package com.example.spring.rest.orders;
 
-import com.example.spring.rest.carts.Cart;
-import com.example.spring.rest.payments.PaymentStatus;
 import com.example.spring.rest.users.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +22,7 @@ import java.util.UUID;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
