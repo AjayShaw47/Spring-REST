@@ -13,14 +13,7 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order,UUID> {
 
-//    @EntityGraph(attributePaths = "items.product")
-//    @Query("SELECT o FROM Order o WHERE o.customer = :customer")
-//    List<Order> getOrdersByCustomer(@Param("customer") User customer);
-//
-//    @EntityGraph(attributePaths = "items.product")
-//    @Query("SELECT o FROM Order o WHERE o.id = :orderId")
-//    Optional<Order> getOrderWithItems(@Param("orderId") Long orderId);
+    List<Order> findByCustomer(User customer);
 
-     List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status);
 
 }

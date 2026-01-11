@@ -1,14 +1,13 @@
 package com.example.spring.rest.orders;
 
-import lombok.Data;
-
+import com.example.spring.rest.products.ProductDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
-public class OrderItemDTO {
-    private ProductDTO product;
-    private Integer quantity;
-    private Integer deliveryOptionId;
-    private LocalDateTime estimatedDeliveryDate;
+public record OrderItemDTO(
+        ProductDTO product,
+        Integer quantity,
+        Integer deliveryOptionId,
+        LocalDateTime estimatedDeliveryDate
+) {
 }

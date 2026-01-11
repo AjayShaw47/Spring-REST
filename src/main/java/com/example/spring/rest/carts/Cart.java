@@ -25,7 +25,7 @@ public class Cart {
     @Column(columnDefinition = "RAW(16)")
     private UUID id;
 
-    @Column(name = "status",insertable = false, length = 10, nullable = false)
+    @Column(name = "status", length = 20, nullable = false)
     private String status;
 
     @Column(name = "date_created", insertable = false,updatable = false)

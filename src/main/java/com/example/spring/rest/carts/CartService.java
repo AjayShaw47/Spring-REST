@@ -6,26 +6,33 @@ import com.example.spring.rest.products.ProductNotFoundException;
 import com.example.spring.rest.products.ProductRepository;
 import com.example.spring.rest.users.User;
 import com.example.spring.rest.users.UserRepository;
-import com.example.spring.rest.users.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Service
+@Transactional
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final CartMapper cartMapper;
+    private final UserRepository userRepository;
 
-    public CartDTO getActiveCartForUser(User user) {
+    public CartDTO getActiveCartForUser(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+
         Cart cart = cartRepository.findByUserAndStatus(user,"ACTIVE")
                 .orElseGet(()->{
                     Cart newCart = new Cart();
                     newCart.setUser(user);
+                    newCart.setStatus("ACTIVE");
                     user.getCarts().add(newCart);
+                    System.out.println("Creating new cart for user: " + user.getEmail());
                     return cartRepository.save(newCart);
                 });
         return cartMapper.toDto(cart);

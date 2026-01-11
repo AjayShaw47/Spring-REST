@@ -30,10 +30,9 @@ public class Order {
     private User customer;
 
     @Enumerated(EnumType.STRING)
-    @Column(insertable = false)
     private OrderStatus status;
 
-    @Column(insertable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     private BigDecimal totalPrice;

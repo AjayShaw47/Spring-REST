@@ -1,19 +1,21 @@
 package com.example.spring.rest.orders;
 
 import com.example.spring.rest.auth.AuthService;
-import com.example.spring.rest.carts.CartRepository;
-import com.example.spring.rest.carts.CartService;
+import com.example.spring.rest.carts.*;
 import com.example.spring.rest.users.User;
 import com.example.spring.rest.users.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,40 +27,43 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final UserRepository userRepository;
     private final CartService cartService;
+    private final CartRepository cartRepository;
 
-    public OrderDTO createOrder(CreateOrderRequest request){
-
-        User user = userRepository.findById(request.getCustomerId()).orElse(null);
-        if(user == null){
-            throw new UsernameNotFoundException("User not found");
+    @Transactional
+    public OrderDTO createOrder(User user) {
+        Cart cart = cartRepository.findByUserAndStatus(user,"ACTIVE")
+                .orElseThrow(() -> new IllegalStateException("No active cart found for user"));
+        Set<CartItem> cartItems = cart.getItems();
+        if(cartItems.isEmpty()){
+            throw new IllegalStateException("Cannot create order from empty cart");
         }
-
-        request.getItems().forEach(item -> logger.info("DTO deliveryOptionId: {}", item.getDeliveryOptionId()));
-
-        List<OrderItem> items = request.getItems().stream().map(orderMapper::toEntity).toList();
-
-        items.forEach(item -> logger.info("Entity deliveryOptionId: {}", item.getDeliveryOptionId()));
-
         Order order = new Order();
+        order.setCreatedAt(LocalDateTime.now());
+        order.setStatus(OrderStatus.PREPARING);
         order.setCustomer(user);
-        order.setTotalPrice(request.getTotalPrice());
-        order.setItems(items);
-        order.getItems().forEach(item-> {
-            item.setOrder(order);
-            if(item.getDeliveryOptionId() == 1)
-                item.setEstimatedDeliveryDate(LocalDateTime.now().plusDays(1));
-            else if (item.getDeliveryOptionId() == 2)
-                item.setEstimatedDeliveryDate(LocalDateTime.now().plusDays(3));
-            else
-                item.setEstimatedDeliveryDate(LocalDateTime.now().plusDays(7));
-        });
+        order.setTotalPrice(cart.getTotalPrice());
+
+        List<OrderItem> orderItems = cart.getItems().stream()
+                .map(cartItem -> {
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setProduct(cartItem.getProduct());
+                    orderItem.setQuantity(cartItem.getQuantity());
+                    orderItem.setDeliveryOptionId(cartItem.getDeliveryOptionId());
+                    orderItem.setOrder(order);
+                    return orderItem;
+                })
+                .toList();
+
+        order.setItems(orderItems);
         Order savedOrder = orderRepository.save(order);
-        cartService.clearCart(request.getCartId());
+        logger.info("Order created with ID: {} for user: {}", savedOrder.getId(), user.getEmail());
+        cartRepository.delete(cart);
         return orderMapper.toDto(savedOrder);
+
     }
 
-    public List<UserOrderResponse> getUserOrders() {
-        List<Order> orders = orderRepository.findByCustomerIdAndStatus(31L, OrderStatus.PREPARING);
+    public List<UserOrderResponse> getUserOrders(User user) {
+        List<Order> orders = orderRepository.findByCustomer(user);
 
         return orders.stream()
                 .map(orderMapper::toUserOrderResponse)

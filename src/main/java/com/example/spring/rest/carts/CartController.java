@@ -22,9 +22,8 @@ public class CartController {
 
     @GetMapping("/active")
     public ResponseEntity<CartDTO> getActiveCart(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = (User) userDetails;
-        System.out.println("Authenticated active user: " + user.getEmail());
-        CartDTO cart = cartService.getActiveCartForUser(user);
+        System.out.println("Authenticated active user: " + userDetails.getUsername());
+        CartDTO cart = cartService.getActiveCartForUser(userDetails.getUsername());
         return ResponseEntity.ok(cart);
     }
 
@@ -39,6 +38,7 @@ public class CartController {
     public ResponseEntity<CartItemDTO> updateCart(@PathVariable UUID cartId,
                                                   @PathVariable Long productId,
                                                   @RequestBody UpdateCart request) {
+        System.out.println("Updating cart: " + cartId + " for product: " + productId);
         CartItemDTO cartItemDTO = cartService.updateCart(cartId, productId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDTO);
 
