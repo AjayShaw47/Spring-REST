@@ -1,4 +1,4 @@
-# === PostgresSQL DB Configuration ===
+# === Oracle DB Configuration ===
 
 spring:
   datasource:
@@ -12,3 +12,22 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ecommerce-backend
+    version: 1.0.0-dev
+    description: Development environment for Ecommerce Backend Application
+
