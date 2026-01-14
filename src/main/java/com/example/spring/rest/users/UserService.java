@@ -3,6 +3,8 @@ package com.example.spring.rest.users;
 import com.example.spring.rest.common.DuplicateResourceException;
 import com.example.spring.rest.common.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +20,18 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     public List<UserSummary> getAllUsers(){
+        logger.debug("Fetching all users");
         return userRepository.findAllBy();
     }
 
     public UserResponse getUser(Long id){
+        logger.debug("Fetching user by id: {}", id);
         User user = userRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException("User not found with id: " + id));
         return userMapper.toDto(user);
@@ -34,6 +39,7 @@ public class UserService {
     }
 
     public UserResponse getUser(String email){
+        logger.debug("Fetching user by email: {}", email);
         User user = userRepository.findByEmail(email).orElseThrow(()->
                 new ResourceNotFoundException("User not found with email: " + email));
         return userMapper.toDto(user);
@@ -41,6 +47,7 @@ public class UserService {
     }
 
     public UserResponse registerUser(RegisterUserRequest request){
+        logger.debug("Registering new user with email: {}", request.email());
         if (userRepository.existsByEmail(request.email())) {
             throw new DuplicateResourceException(
                     "User with email " + request.email() + " already exists"
@@ -56,6 +63,7 @@ public class UserService {
     }
 
     public UserResponse patchUser(Long id, UpdateUserRequest request) {
+        logger.debug("Updating user with id: {}", id);
         User user = userRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException("User not found with id: " + id));
 
@@ -79,6 +87,7 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
+        logger.debug("Deleting user with id: {}", id);
         try {
             userRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {

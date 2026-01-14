@@ -3,6 +3,8 @@ package com.example.spring.rest.users;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +22,20 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/users")
 public class UserController {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserSummary>  getAllUsers(){
+        logger.info("Request to get all users");
         return userService.getAllUsers(); // 200
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id){
+        logger.info("Request to get user by id: {}", id);
         UserResponse user = userService.getUser(id);
         return ResponseEntity.ok(user); // 200
         //        return ResponseEntity.status(HttpStatus.OK).body(user);
@@ -41,6 +45,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(Principal principal) {
+        logger.info("Request to get current user: {}", principal.getName());
         System.out.println("Current user: " + principal.getName());
         // Find the user details based on the principal name (username/email from token)
         UserResponse user = userService.getUser(principal.getName());
@@ -49,7 +54,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> registerUser (@Valid @RequestBody RegisterUserRequest request){
-
+        logger.info("Request to register new user with email: {}", request.email());
         UserResponse savedUser =userService.registerUser(request);
 
         URI location = ServletUriComponentsBuilder
@@ -71,6 +76,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request){
+        logger.info("Request to update user with id: {}", id);
         /*
         User user = userService.getUser(id);
         if(user == null){
@@ -85,6 +91,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        logger.info("Request to delete user with id: {}", id);
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
