@@ -5,6 +5,9 @@ import com.example.spring.rest.orders.Order;
 import com.example.spring.rest.products.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +21,7 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
 
     @Id
@@ -35,10 +39,10 @@ public class User implements UserDetails {
     // That means it stores the ordinal number of the enum constant: USER -> 0 and ADMIN -> 1, This causes serious issues if you change the enum order later
     private Role role;
 
-    @Column(name = "created_at",updatable = false, insertable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @ElementCollection

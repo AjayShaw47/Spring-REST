@@ -48,6 +48,7 @@ public class UserService {
 
     public UserResponse registerUser(RegisterUserRequest request){
         logger.debug("Registering new user with email: {}", request.email());
+
         if (userRepository.existsByEmail(request.email())) {
             throw new DuplicateResourceException(
                     "User with email " + request.email() + " already exists"

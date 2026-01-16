@@ -95,24 +95,24 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-/*
-    @PostMapping("/{id}/change-password")
-    public ResponseEntity<Void> changePassword(@PathVariable Long id,@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
-        User user = userService.getUser(id);
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
 
-        if(!changePasswordRequest.getOldPassword().equals(user.getPassword())){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+//    @PostMapping("/{id}/change-password")
+//    public ResponseEntity<Void> changePassword(@PathVariable Long id,@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
+//        User user = userService.getUser(id);
+//        if(user == null){
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        if(!changePasswordRequest.getOldPassword().equals(user.getPassword())){
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//
+//        user.setPassword(changePasswordRequest.getNewPassword());
+//        userService.registerUser(user);
+//
+//        return ResponseEntity.noContent().build();
+//    }
 
-        user.setPassword(changePasswordRequest.getNewPassword());
-        userService.registerUser(user);
-
-        return ResponseEntity.noContent().build();
-    }
-*/
 
 }
 
