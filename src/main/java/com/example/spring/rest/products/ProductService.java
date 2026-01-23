@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -19,7 +17,7 @@ public class ProductService {
     private ProductMapper productMapper;
     private CategoryRepository categoryRepository;
 
-    public Map<String, Object> getALlProducts(Byte categoryId, int page, int size) {
+    public ProductResponse getALlProducts(Byte categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> productPage;
         if(categoryId != null)
@@ -29,14 +27,12 @@ public class ProductService {
 
         List<ProductDTO> productDTO = productPage.getContent().stream().map(product -> productMapper.toDto(product)).toList();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", productDTO);
-        response.put("currentPage", productPage.getNumber());
-        response.put("totalItems", productPage.getTotalElements());
-        response.put("totalPages", productPage.getTotalPages());
-
-        return response;
-
+        return new ProductResponse(
+                productDTO,
+                productPage.getNumber(),
+                productPage.getTotalElements(),
+                productPage.getTotalPages()
+        );
     }
 
     public ProductDTO getProduct(Long id) {
@@ -51,14 +47,14 @@ public class ProductService {
 
         Product product = productMapper.toEntity(productDTO);
 //        product.setCategory(category);
-        productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
         return new ProductDTO(
-                product.getId(),
-                productDTO.name(),
-                productDTO.price(),
+                savedProduct.getId(),
+                savedProduct.getName(),
+                savedProduct.getPrice(),
 //                productDTO.categoryId(),
-                productDTO.ratingCount(),
-                productDTO.ratingStar()
+                savedProduct.getRatingCount(),
+                savedProduct.getRatingStar()
         );
     }
 

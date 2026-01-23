@@ -18,11 +18,11 @@ public class ProductController {
     private  ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getProducts(@RequestParam(required = false) Byte categoryId,
+    public ResponseEntity<ProductResponse> getProducts(@RequestParam(required = false) Byte categoryId,
                                                            @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size){
 
-        Map<String, Object> response = productService.getALlProducts(categoryId,page,size);
+        ProductResponse response = productService.getALlProducts(categoryId,page,size);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -37,9 +37,10 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO){
         ProductDTO savedProduct = productService.registerProduct(productDTO);
-        URI location = URI.create("/products/" + savedProduct.id());
-        return ResponseEntity.created(location).body(productDTO);
+        URI location = URI.create("/api/products/" + savedProduct.id());
+        return ResponseEntity.created(location).body(savedProduct);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id,
                                                     @RequestBody ProductDTO productDTO){
